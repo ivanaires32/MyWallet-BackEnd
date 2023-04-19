@@ -1,7 +1,7 @@
 import express, { json } from "express"
 import cors from "cors"
 import dotenv from "dotenv"
-import { MongoClient } from "mongodb"
+import { MongoClient, ObjectId } from "mongodb"
 import joi from "joi"
 import bcrypt from "bcrypt"
 import { v4 as uuid } from "uuid"
@@ -54,30 +54,42 @@ app.post("/newUser", async (req, res) => {
 
 app.post("/sign-in", async (req, res) => {
     const { email, password } = req.body
-    const token = uuid()
+
 
     if (!email || !password) return res.status(422).send("Campos obrigatorios")
 
     try {
         const user = await db.collection("users").findOne({ email })
-        if (user && bcrypt.compareSync(password, user.password)) {
-            await db.collection("sessoes").insertOne({ token, idUser: user._id })
-            res.status(200).send(token)
-        } else {
-            res.status(404).send("Email ou senha incorret")
-        }
+        if (!user) return res.status(404).send("Email não encontrado")
+
+        const senhaUser = bcrypt.compareSync(password, user.password)
+        if (!senhaUser) return res.status(401).send("Senha incorreta")
+
+        const token = uuid()
+        await db.collection("sessoes").insertOne({ token, idUser: user._id })
+        res.send(token)
+    } catch (err) {
+        res.status(500).send("oi")
+    }
+})
+
+app.get("/home", async (req, res) => {
+    const { authorization } = req.headers
+    const token = authorization?.replace("Bearer ", "")
+
+    if (!token) return res.sendStatus(401)
+    try {
+        const sessao = await db.collection("sessoes").findOne({ token })
+        if (!sessao) return res.sendStatus(404)
+        const user = await db.collection("users").findOne({ _id: new ObjectId(sessao.idUser) })
+        if (!user) return res.sendStatus(404)
+        delete user.password
+        res.status(200).send(user)
     } catch (err) {
         res.status(500).send(err.message)
     }
 })
 
-app.get("/home", async (req, res) => {
-    const { autorization } = req.body
-    try {
-
-    } catch (err) {
-
-    }
-})
+app.post("")
 
 app.listen(5000, () => console.log("Servidor rodando"))
