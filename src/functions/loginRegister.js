@@ -21,7 +21,7 @@ export async function newUser(req, res) {
 
     try {
         const unserOn = await db.collection("users").findOne({ email })
-        if (unserOn) return res.status(409).send("Usuario já cadastrado")
+        if (unserOn) return res.status(409).send("Email já cadastrado")
 
         const hash = bcrypt.hashSync(password, 10)
         await db.collection("users").insertOne({ name, email, password: hash })
