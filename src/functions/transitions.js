@@ -18,7 +18,7 @@ export async function home(req, res) {
         delete user.password
 
         const dadosTransacao = await db.collection("transacoes").find({ idUser: sessao.idUser }).toArray()
-        if (!dadosTransacao) res.status(200).send(user)
+        if (dadosTransacao.length === 0) return res.status(200).send(user)
 
         res.status(200).send(dadosTransacao)
     } catch (err) {
