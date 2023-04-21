@@ -1,7 +1,7 @@
 import joi from "joi"
 import dayjs from "dayjs"
 import { ObjectId } from "mongodb"
-import { db } from "../app.js"
+import { db } from "../database/dataBase.js"
 
 
 export async function home(req, res) {
