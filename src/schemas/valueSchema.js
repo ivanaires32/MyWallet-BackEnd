@@ -1,5 +1,5 @@
 import joi from "joi"
 export const valueSchema = joi.object({
-    valor: joi.number().required(),
+    value: joi.number().required(),
     description: joi.string().required()
 })
