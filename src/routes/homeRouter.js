@@ -7,7 +7,7 @@ import { authValidation } from "../middelwares/authMiddelware.js"
 const homeRouter = Router()
 
 homeRouter.use(authValidation)
-homeRouter.get("/home", validarDados(valueSchema), home)
+homeRouter.get("/home", home)
 homeRouter.post("/nova-transacao/:tipo", validarDados(valueSchema), trasition)
 
 export default homeRouter
