@@ -1,23 +1,11 @@
 import bcrypt from "bcrypt"
-import joi from "joi"
 import { v4 as uuid } from "uuid"
 import { db } from "../database/dataBase.js"
-
-
-const userSchema = joi.object({
-    name: joi.string().required(),
-    email: joi.string().required().email(),
-    password: joi.string().required().min(3)
-})
-
 
 export async function newUser(req, res) {
     const { name, email, password } = req.body
 
-    const validation = userSchema.validate(req.body, { abortEarly: false })
-    if (validation.error) {
-        return res.status(422).send(validation.error.details.map(d => d.message))
-    }
+    if (!name || !email || !password) return res.status(422).send("Todos os campos são obrigatorios")
 
     try {
         const unserOn = await db.collection("users").findOne({ email })
@@ -34,9 +22,6 @@ export async function newUser(req, res) {
 
 export async function login(req, res) {
     const { email, password } = req.body
-
-
-    if (!email || !password) return res.status(422).send("Todos os campos obrigatorios")
 
     try {
         const user = await db.collection("users").findOne({ email })

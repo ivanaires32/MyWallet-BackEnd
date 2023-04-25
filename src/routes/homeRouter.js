@@ -1,10 +1,13 @@
 import { Router } from "express"
 import { home, trasition } from "../controllers/transitions.controller.js"
+import { validarDados } from "../middelwares/validarDados.js"
+import { valueSchema } from "../schemas/valueSchema.js"
+import { authValidation } from "../middelwares/authMiddelware.js"
 
 const homeRouter = Router()
 
-homeRouter.get("/home", home)
-
-homeRouter.post("/nova-transacao/:tipo", trasition)
+homeRouter.use(authValidation)
+homeRouter.get("/home", validarDados(valueSchema), home)
+homeRouter.post("/nova-transacao/:tipo", validarDados(valueSchema), trasition)
 
 export default homeRouter
